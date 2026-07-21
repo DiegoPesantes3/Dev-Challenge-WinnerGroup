@@ -1,21 +1,36 @@
-import { useState } from 'react'
+import { useState } from 'react';
+import ImageUploader from './components/ImageUploader';
+import AnalysisResult from './components/AnalysisResult';
+import BackgroundSlider from './components/BackgroundSlider';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [result, setResult] = useState(null);
+
+  const handleImageUpload = async (file) => {
+    console.log("Preparado para enviar al backend:", file.name);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-4">
-      <h1 className="text-3xl font-bold mb-4">Vite + React + Tailwind CSS</h1>
-      <div className="p-4 bg-slate-800 rounded-lg border border-slate-700">
-        <button
-          onClick={() => setCount((count) => count + 1)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded font-medium transition"
-        >
-          Count is {count}
-        </button>
+    <div className="relative bg-slate-900 min-h-screen w-full text-white flex flex-col items-center justify-center overflow-hidden">
+      <BackgroundSlider />
+
+      <div className="relative z-10 flex flex-col items-center p-6 text-center">
+        <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 drop-shadow-lg">
+          Detector Fake News Gamer
+        </h1>
+        <p className="mt-4 mb-10 text-slate-300 max-w-lg text-lg">
+          Sube una captura de pantalla y nuestra IA contrastará su veracidad contra las noticias de IGN Latinoamérica.
+        </p>
+
+        {!result ? (
+          <ImageUploader onImageDrop={handleImageUpload} />
+        ) : (
+          <AnalysisResult result={result} />
+        )}
+
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
