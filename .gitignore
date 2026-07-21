@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node.js y React
+node_modules/
+dist/
+npm-debug.log*
+.env
+.env.local
