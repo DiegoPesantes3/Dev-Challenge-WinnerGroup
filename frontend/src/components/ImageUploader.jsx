@@ -17,15 +17,24 @@ const ImageUploader = ({ onImageDrop }) => {
     e.preventDefault();
     setIsDragging(false);
 
+    // 1. Intentar obtener un archivo local
     const file = e.dataTransfer.files[0];
     if (file) {
-      const tiposValidos = ["image/jpeg", "image/png", "image/webp"];
+      const tiposValidos = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
       if (!tiposValidos.includes(file.type)) {
-        alert("Formato no válido. Por favor sube solo imágenes.");
+        alert("Formato no válido. Por favor sube solo imágenes (JPEG, PNG, WEBP)."); 
         return;
       }
-
       onImageDrop(file);
+      return;
+    }
+
+    // 2. Si no es un archivo local, intentar obtener la URL si arrastraron una imagen desde otra pestaña
+    const url = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("URL");
+    if (url) {
+      const cleanUrl = url.trim().split("\n")[0]; // Quedarse con la primera URL si hay varias
+      onImageDrop(cleanUrl);
+      return;
     }
   };
 
@@ -38,11 +47,11 @@ const ImageUploader = ({ onImageDrop }) => {
   };
 
   return (
-    <div className="mt-8 w-full max-w-lg flex flex-col gap-6">
+    <div className="mt-8 w-full max-w-lg flex flex-col gap-6">     
       <div
         className={`w-full p-12 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
           isDragging
-            ? "border-indigo-500 bg-indigo-500/20 scale-105"
+            ? "border-indigo-500 bg-indigo-500/20 scale-105"       
             : "border-slate-500 bg-slate-800 cursor-pointer hover:bg-slate-700"
         }`}
         onDragOver={handleDragOver}
@@ -54,8 +63,8 @@ const ImageUploader = ({ onImageDrop }) => {
             ¡Suelta la imagen aquí!
           </p>
         ) : (
-          <div className="text-center pointer-events-none">
-            <p className="text-slate-300 font-medium text-lg">
+          <div className="text-center pointer-events-none">        
+            <p className="text-slate-300 font-medium text-lg">     
               Arrastra y suelta tu Imagen aquí
             </p>
           </div>
@@ -70,7 +79,7 @@ const ImageUploader = ({ onImageDrop }) => {
         <div className="h-px bg-slate-600 flex-1"></div>
       </div>
 
-      <form onSubmit={handleUrlSubmit} className="flex gap-3">
+      <form onSubmit={handleUrlSubmit} className="flex gap-3">     
         <input
           type="url"
           placeholder="https://ejemplo.com/imagen.jpg"
