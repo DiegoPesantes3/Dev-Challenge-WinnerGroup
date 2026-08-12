@@ -7,7 +7,7 @@ Desarrollado para el **Dev Challenge 2026** por estudiantes de **PUCE TEC**:
 - Diego Pesantes
 - David Sanipatin
 
-## Stack Tecnológico (MVP)
+## Stack Tecnológico
 
 ### Frontend
 - **React + Vite:** Para una interfaz de usuario rápida y dinámica.
