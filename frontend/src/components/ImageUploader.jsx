@@ -1,8 +1,34 @@
 import { useState } from "react";
 
-const ImageUploader = ({ onImageDrop }) => {
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+const ImageUploader = ({ onImageDrop, onNotify }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [urlInput, setUrlInput] = useState("");
+
+  const validateFile = (file) => {
+    const tiposValidos = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+
+    if (!tiposValidos.includes(file.type)) {
+      onNotify?.({
+        title: "Formato no soportado",
+        message: "Solo se admiten imágenes JPG, PNG o WEBP.",
+        type: "warning",
+      });
+      return false;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      onNotify?.({
+        title: "Archivo demasiado grande",
+        message: "La imagen supera el tamaño máximo permitido (10 MB).",
+        type: "warning",
+      });
+      return false;
+    }
+
+    return true;
+  };
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -17,22 +43,16 @@ const ImageUploader = ({ onImageDrop }) => {
     e.preventDefault();
     setIsDragging(false);
 
-    // 1. Intentar obtener un archivo local
     const file = e.dataTransfer.files[0];
     if (file) {
-      const tiposValidos = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-      if (!tiposValidos.includes(file.type)) {
-        alert("Formato no válido. Por favor sube solo imágenes (JPEG, PNG, WEBP)."); 
-        return;
-      }
+      if (!validateFile(file)) return;
       onImageDrop(file);
       return;
     }
 
-    // 2. Si no es un archivo local, intentar obtener la URL si arrastraron una imagen desde otra pestaña
     const url = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("URL");
     if (url) {
-      const cleanUrl = url.trim().split("\n")[0]; // Quedarse con la primera URL si hay varias
+      const cleanUrl = url.trim().split("\n")[0];
       onImageDrop(cleanUrl);
       return;
     }
