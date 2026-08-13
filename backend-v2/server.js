@@ -1,10 +1,12 @@
 import express from "express";
 import { AppDataSource } from "./src/config/db.js";
+import authRoutes from "./src/routes/auth.routes.js"
 
 const app = express();
 const PORT = process.env.PORT || 3001
 
 app.use(express.json())
+app.use("/api/auth", authRoutes)
 
 app.get('/', (req, res) => {
     res.json({ message: "Server is alive!" })
