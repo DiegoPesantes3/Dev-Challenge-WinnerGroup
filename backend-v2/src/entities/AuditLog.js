@@ -11,3 +11,4 @@ export const AuditLog = new EntitySchema({
         db_user: { type: "varchar" }
     }
 });
+
