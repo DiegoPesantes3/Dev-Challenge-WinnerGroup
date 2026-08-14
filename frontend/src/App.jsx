@@ -4,6 +4,9 @@ import AnalysisResult from "./components/AnalysisResult";
 import BackgroundSlider from "./components/BackgroundSlider";
 import Sidebar from "./components/Sidebar";
 import DashboardPage from "./pages/DashboardPage";
+import HistoryPage from "./pages/HistoryPage";
+import LoginPage from "./pages/LoginPage";
+import PricingModal from "./components/PricingModal";
 import { verifyImage } from "./services";
 
 function App() {
@@ -11,20 +14,38 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'dashboard'
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'dashboard' | 'login'
   const [dashboardTab, setDashboardTab] = useState('history'); // 'history' | 'reports' | 'settings'
-  const [user, setUser] = useState(null); // Mock auth state
+  const [user, setUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem('mancos_user');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+  const [guestCredits, setGuestCredits] = useState(() => {
+    const v = parseInt(localStorage.getItem('mancos_guest_credits') || "3", 10);
+    return Number.isNaN(v) ? 3 : v;
+  });
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const notificationTimeoutRef = useRef(null);
 
-  const handleLogin = () => {
-    setUser({ name: 'Admin', avatar: 'https://ui-avatars.com/api/?name=Admin&background=4f46e5&color=fff' });
+  const handleOpenLogin = () => setCurrentView('login');
+
+  const performLogin = (userObj) => {
+    setUser(userObj);
+    try {
+      localStorage.setItem('mancos_user', JSON.stringify(userObj));
+    } catch (e) {}
+    setCurrentView('home');
   };
 
   const handleLogout = () => {
     setUser(null);
     setIsProfileMenuOpen(false);
-    if (currentView === 'dashboard') {
+    try { localStorage.removeItem('mancos_user'); } catch (e) {}
+    if (currentView === 'dashboard' || currentView === 'history') {
       setCurrentView('home');
     }
   };
@@ -49,6 +70,19 @@ function App() {
   const handleNewQuery = () => {
     setResult(null);
     setCurrentView('home');
+  };
+
+  const handleUpgrade = () => {
+    // Mostrar modal de precios (no otorgar mejoras automáticamente)
+    setShowPricing(true);
+  };
+
+  const [showPricing, setShowPricing] = useState(false);
+
+  const handlePurchaseMock = (plan) => {
+    // No otorgar mejoras; solo mostrar notificación de mock
+    showNotification({ title: 'Pago (simulado)', message: `Has seleccionado ${plan.name} (${plan.price}). La pasarela de pago no está implementada.`, type: 'info', autoCloseMs: 4000 });
+    setShowPricing(false);
   };
 
   const closeNotification = () => {
@@ -78,6 +112,28 @@ function App() {
   }, []);
 
   const handleImageUpload = async (imageInput) => {
+    // Comprobar créditos antes de permitir la solicitud
+    const available = user ? (user.credits || 0) : guestCredits;
+    if ((available || 0) <= 0) {
+      if (user) {
+        showNotification({ title: 'Límite alcanzado', message: 'Se han agotado tus consultas gratuitas. Mejora tu plan para más consultas.', type: 'warning', retryAction: handleUpgrade });
+      } else {
+        showNotification({ title: 'Límite alcanzado', message: 'Has alcanzado el límite de 3 consultas. Inicia sesión para obtener 10 consultas gratis.', type: 'warning', retryAction: () => setCurrentView('login') });
+      }
+      return;
+    }
+
+    // Consumir un crédito
+    if (user) {
+      const updated = { ...user, credits: (user.credits || 0) - 1 };
+      setUser(updated);
+      try { localStorage.setItem('mancos_user', JSON.stringify(updated)); } catch (e) {}
+    } else {
+      const newGuest = Math.max(0, guestCredits - 1);
+      setGuestCredits(newGuest);
+      try { localStorage.setItem('mancos_guest_credits', String(newGuest)); } catch (e) {}
+    }
+
     setLoading(true);
     setResult(null);
     setError(null);
@@ -159,14 +215,21 @@ function App() {
         <div className="flex items-center gap-6">
           {user ? (
             <div className="relative">
-              <button 
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full transition-colors border border-slate-700"
-              >
-                <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-indigo-500" />
-                <span className="text-sm font-medium text-slate-200 hidden sm:block">{user.name}</span>
-                <svg className={`w-4 h-4 text-slate-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-              </button>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded">{(user.credits||0)} consultas</span>
+                <button onClick={handleUpgrade} className="text-xs bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded transition-colors flex items-center gap-2">
+                  <span className="text-sm">💳</span>
+                  <span>Mejorar (Pagar)</span>
+                </button>
+                <button 
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full transition-colors border border-slate-700"
+                >
+                  <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-indigo-500" />
+                  <span className="text-sm font-medium text-slate-200 hidden sm:block">{user.name}</span>
+                  <svg className={`w-4 h-4 text-slate-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+              </div>
 
               {isProfileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50 overflow-hidden">
@@ -204,9 +267,16 @@ function App() {
               )}
             </div>
           ) : (
-            <button onClick={handleLogin} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-              Iniciar Sesión
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded">{guestCredits} consultas</span>
+              <button onClick={handleOpenLogin} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                Iniciar Sesión
+              </button>
+              <button onClick={handleUpgrade} className="text-xs bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded transition-colors flex items-center gap-2">
+                <span className="text-sm">💳</span>
+                <span>Mejorar (Pagar)</span>
+              </button>
+            </div>
           )}
         </div>
       </nav>
@@ -243,8 +313,14 @@ function App() {
               <AnalysisResult result={result} />
             )}
           </div>
+        ) : currentView === 'login' ? (
+          <LoginPage onLogin={performLogin} onCancel={() => setCurrentView('home')} />
         ) : (
           <DashboardPage user={user} activeTab={dashboardTab} setActiveTab={setDashboardTab} />
+        )}
+
+        {showPricing && (
+          <PricingModal onClose={() => setShowPricing(false)} onPurchase={handlePurchaseMock} />
         )}
       </div>
     </div>
