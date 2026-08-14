@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import ImageUploader from "./components/ImageUploader";
 import AnalysisResult from "./components/AnalysisResult";
 import BackgroundSlider from "./components/BackgroundSlider";
-import HistoryPage from "./pages/HistoryPage";
+import Sidebar from "./components/Sidebar";
+import DashboardPage from "./pages/DashboardPage";
 import { verifyImage } from "./services";
 
 function App() {
@@ -10,8 +11,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'history'
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'dashboard'
+  const [dashboardTab, setDashboardTab] = useState('history'); // 'history' | 'reports' | 'settings'
   const [user, setUser] = useState(null); // Mock auth state
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const notificationTimeoutRef = useRef(null);
 
   const handleLogin = () => {
@@ -20,17 +23,32 @@ function App() {
 
   const handleLogout = () => {
     setUser(null);
-    if (currentView === 'history') {
+    setIsProfileMenuOpen(false);
+    if (currentView === 'dashboard') {
       setCurrentView('home');
     }
   };
 
-  const handleNavigation = (view) => {
-    if (view === 'history' && !user) {
-      alert("Debes iniciar sesión para acceder al historial.");
+  const handleNavigation = (view, tab = null) => {
+    if (view === 'dashboard' && !user) {
+      alert("Debes iniciar sesión para acceder al dashboard.");
       return;
     }
     setCurrentView(view);
+    if (tab) {
+      setDashboardTab(tab);
+    }
+    setIsProfileMenuOpen(false);
+  };
+
+  const handleLoadQuery = (queryData) => {
+    setResult(queryData);
+    setCurrentView('home');
+  };
+
+  const handleNewQuery = () => {
+    setResult(null);
+    setCurrentView('home');
   };
 
   const closeNotification = () => {
@@ -91,8 +109,18 @@ function App() {
   };
 
   return (
-    <div className="relative bg-slate-900 min-h-screen w-full text-white flex flex-col items-center justify-center overflow-x-hidden">
-      <BackgroundSlider />
+    <div className="flex h-screen bg-slate-900 w-full overflow-hidden text-white">
+      <Sidebar 
+        user={user} 
+        currentView={currentView} 
+        onNavigate={handleNavigation} 
+        onLoadQuery={handleLoadQuery}
+        onNewQuery={handleNewQuery}
+      />
+      
+      {/* Contenedor Principal Derecho */}
+      <div className="flex-1 flex flex-col relative overflow-hidden">
+        <BackgroundSlider />
 
       {notification && (
         <div className="fixed top-4 right-4 z-50 w-[min(90vw,420px)] rounded-xl border border-slate-700 bg-slate-900/95 shadow-2xl backdrop-blur-md p-4 text-left">
@@ -126,34 +154,54 @@ function App() {
         </div>
       )}
 
-      {/* Navbar Temporal */}
-      <nav className="absolute top-0 left-0 w-full p-4 z-20 flex justify-between items-center bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
-        <div className="font-bold text-xl text-indigo-400">MancOS</div>
+      {/* Navbar Simplificada (Solo Perfil) */}
+      <nav className="absolute top-0 right-0 p-4 z-20 flex justify-end items-center">
         <div className="flex items-center gap-6">
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleNavigation('home')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentView === 'home' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`}
-            >
-              Inicio
-            </button>
-            <button
-              onClick={() => handleNavigation('history')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentView === 'history' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`}
-            >
-              Historial
-            </button>
-          </div>
-
-          <div className="h-6 w-px bg-slate-700 hidden sm:block"></div>
-
           {user ? (
-            <div className="flex items-center gap-3">
-              <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-indigo-500" />
-              <span className="text-sm font-medium text-slate-200 hidden sm:block">{user.name}</span>
-              <button onClick={handleLogout} className="text-xs bg-slate-800 hover:bg-red-600/80 text-slate-300 hover:text-white px-3 py-1.5 rounded transition-colors">
-                Cerrar Sesión
+            <div className="relative">
+              <button 
+                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                className="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full transition-colors border border-slate-700"
+              >
+                <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-indigo-500" />
+                <span className="text-sm font-medium text-slate-200 hidden sm:block">{user.name}</span>
+                <svg className={`w-4 h-4 text-slate-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
+
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-700 mb-1">
+                    <p className="text-sm text-white font-medium">{user.name}</p>
+                    <p className="text-xs text-slate-400 truncate">admin@mancos.ia</p>
+                  </div>
+                  <button 
+                    onClick={() => handleNavigation('dashboard', 'history')}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    🕒 Historial de Consultas
+                  </button>
+                  <button 
+                    onClick={() => handleNavigation('dashboard', 'reports')}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    📊 Reportería Técnica
+                  </button>
+                  <button 
+                    onClick={() => handleNavigation('dashboard', 'settings')}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    ⚙️ Ajustes de Cuenta
+                  </button>
+                  <div className="h-px bg-slate-700 my-1"></div>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <button onClick={handleLogin} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
@@ -196,9 +244,10 @@ function App() {
             )}
           </div>
         ) : (
-          <HistoryPage />
+          <DashboardPage user={user} activeTab={dashboardTab} setActiveTab={setDashboardTab} />
         )}
       </div>
+    </div>
     </div>
   );
 }
