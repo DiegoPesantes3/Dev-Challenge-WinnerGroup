@@ -69,7 +69,7 @@ const ImageUploader = ({ onImageDrop, onNotify }) => {
   return (
     <div className="mt-8 w-full max-w-lg flex flex-col gap-6">     
       <div
-        className={`w-full p-12 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
+        className={`w-full p-6 md:p-12 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 min-h-[160px] ${
           isDragging
             ? "border-indigo-500 bg-indigo-500/20 scale-105"       
             : "border-slate-500 bg-slate-800 cursor-pointer hover:bg-slate-700"
@@ -79,12 +79,12 @@ const ImageUploader = ({ onImageDrop, onNotify }) => {
         onDrop={handleDrop}
       >
         {isDragging ? (
-          <p className="text-2xl font-bold text-indigo-400 animate-pulse pointer-events-none">
+          <p className="text-xl md:text-2xl font-bold text-indigo-400 animate-pulse pointer-events-none text-center">
             ¡Suelta la imagen aquí!
           </p>
         ) : (
           <div className="text-center pointer-events-none">        
-            <p className="text-slate-300 font-medium text-lg">     
+            <p className="text-slate-300 font-medium text-base md:text-lg">     
               Arrastra y suelta tu Imagen aquí
             </p>
           </div>
@@ -93,13 +93,13 @@ const ImageUploader = ({ onImageDrop, onNotify }) => {
 
       <div className="flex items-center gap-3">
         <div className="h-px bg-slate-600 flex-1"></div>
-        <span className="text-slate-400 text-sm font-semibold uppercase tracking-wider">
+        <span className="text-slate-400 text-xs md:text-sm font-semibold uppercase tracking-wider text-center">
           O pega un enlace
         </span>
         <div className="h-px bg-slate-600 flex-1"></div>
       </div>
 
-      <form onSubmit={handleUrlSubmit} className="flex gap-3">     
+      <form onSubmit={handleUrlSubmit} className="flex flex-col sm:flex-row gap-3">     
         <input
           type="url"
           placeholder="https://ejemplo.com/imagen.jpg"
@@ -110,7 +110,7 @@ const ImageUploader = ({ onImageDrop, onNotify }) => {
         />
         <button
           type="submit"
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-indigo-600/30"
+          className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-indigo-600/30 w-full sm:w-auto"
         >
           Analizar
         </button>

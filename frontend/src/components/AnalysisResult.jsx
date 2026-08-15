@@ -37,14 +37,14 @@ const AnalysisResult = ({ result }) => {
 
   return (
     <div
-      className={`mt-8 w-full max-w-2xl bg-slate-900/85 backdrop-blur-xl border-2 rounded-2xl p-8 transition-all duration-500 ${cardColor}`}
+      className={`mt-8 w-full max-w-2xl bg-slate-900/85 backdrop-blur-xl border-2 rounded-2xl p-6 sm:p-8 transition-all duration-500 ${cardColor}`}
     >
-      <div className="flex items-center justify-between border-b border-slate-700 pb-4 mb-6">
-        <h2 className={`text-3xl font-extrabold tracking-tight ${titleColor}`}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-700 pb-4 mb-6 gap-4">
+        <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${titleColor}`}>
           {titleText}
         </h2>
         <span
-          className={`px-4 py-1.5 rounded-full font-bold text-sm border border-current ${
+          className={`px-4 py-1.5 rounded-full font-bold text-sm border border-current whitespace-nowrap ${
             isGamer ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30" : "bg-slate-500/20 text-slate-300 border-slate-500/30"
           }`}
         >

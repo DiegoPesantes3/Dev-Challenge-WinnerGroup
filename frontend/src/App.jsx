@@ -29,6 +29,7 @@ function App() {
     return Number.isNaN(v) ? 3 : v;
   });
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const notificationTimeoutRef = useRef(null);
 
   const handleOpenLogin = () => setCurrentView('login');
@@ -60,16 +61,19 @@ function App() {
       setDashboardTab(tab);
     }
     setIsProfileMenuOpen(false);
+    setIsMobileMenuOpen(false); // Cierra menú móvil al navegar
   };
 
   const handleLoadQuery = (queryData) => {
     setResult(queryData);
     setCurrentView('home');
+    setIsMobileMenuOpen(false);
   };
 
   const handleNewQuery = () => {
     setResult(null);
     setCurrentView('home');
+    setIsMobileMenuOpen(false);
   };
 
   const handleUpgrade = () => {
@@ -172,6 +176,8 @@ function App() {
         onNavigate={handleNavigation} 
         onLoadQuery={handleLoadQuery}
         onNewQuery={handleNewQuery}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
       
       {/* Contenedor Principal Derecho */}
@@ -211,77 +217,89 @@ function App() {
       )}
 
       {/* Navbar Simplificada (Solo Perfil) */}
-      <nav className="absolute top-0 right-0 p-4 z-20 flex justify-end items-center">
-        <div className="flex items-center gap-6">
+      <nav className="absolute top-0 right-0 left-0 p-4 z-20 flex justify-between items-center pointer-events-none md:justify-end">
+        {/* Hamburger Menu (Mobile) */}
+        <div className="md:hidden pointer-events-auto">
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)} 
+            className="p-2 text-slate-300 hover:text-white bg-slate-800/80 rounded-lg border border-slate-700 shadow-lg backdrop-blur-sm transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-4 pointer-events-auto flex-wrap justify-end">
           {user ? (
             <div className="relative">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded">{(user.credits||0)} consultas</span>
-                <button onClick={handleUpgrade} className="text-xs bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded transition-colors flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded hidden sm:inline-block">{(user.credits||0)} consultas</span>
+                <button onClick={handleUpgrade} className="text-xs bg-rose-600 hover:bg-rose-500 text-white px-2 py-1.5 sm:px-3 rounded transition-colors flex items-center gap-1 sm:gap-2">
                   <span className="text-sm">💳</span>
-                  <span>Mejorar (Pagar)</span>
+                  <span className="hidden sm:inline">Mejorar (Pagar)</span>
+                  <span className="sm:hidden">Mejorar</span>
                 </button>
                 <button 
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                  className="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full transition-colors border border-slate-700"
+                  className="flex items-center gap-2 sm:gap-3 bg-slate-800 hover:bg-slate-700 px-2 sm:px-3 py-1.5 rounded-full transition-colors border border-slate-700"
                 >
-                  <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-indigo-500" />
+                  <img src={user.avatar} alt="Avatar" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-indigo-500" />
                   <span className="text-sm font-medium text-slate-200 hidden sm:block">{user.name}</span>
                   <svg className={`w-4 h-4 text-slate-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
               </div>
 
               {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50 overflow-hidden">
                   <div className="px-4 py-3 border-b border-slate-700 mb-1">
-                    <p className="text-sm text-white font-medium">{user.name}</p>
+                    <p className="text-sm text-white font-medium truncate">{user.name}</p>
                     <p className="text-xs text-slate-400 truncate">admin@mancos.ia</p>
+                    <p className="text-xs text-indigo-400 mt-1 sm:hidden">{(user.credits||0)} consultas</p>
                   </div>
                   <button 
                     onClick={() => handleNavigation('dashboard', 'history')}
                     className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2"
                   >
-                    🕒 Historial de Consultas
+                    🕒 <span className="truncate">Historial</span>
                   </button>
                   <button 
                     onClick={() => handleNavigation('dashboard', 'reports')}
                     className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2"
                   >
-                    📊 Reportería Técnica
+                    📊 <span className="truncate">Reportería</span>
                   </button>
                   <button 
                     onClick={() => handleNavigation('dashboard', 'settings')}
                     className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2"
                   >
-                    ⚙️ Ajustes de Cuenta
+                    ⚙️ <span className="truncate">Ajustes</span>
                   </button>
                   <div className="h-px bg-slate-700 my-1"></div>
                   <button 
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     Cerrar Sesión
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded">{guestCredits} consultas</span>
-              <button onClick={handleOpenLogin} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded hidden sm:inline-block">{guestCredits} consultas</span>
+              <button onClick={handleOpenLogin} className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm whitespace-nowrap">
                 Iniciar Sesión
               </button>
-              <button onClick={handleUpgrade} className="text-xs bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded transition-colors flex items-center gap-2">
+              <button onClick={handleUpgrade} className="text-xs bg-rose-600 hover:bg-rose-500 text-white px-2 py-1.5 sm:px-3 sm:py-1.5 rounded transition-colors flex items-center gap-1 sm:gap-2">
                 <span className="text-sm">💳</span>
-                <span>Mejorar (Pagar)</span>
+                <span className="hidden sm:inline">Mejorar</span>
               </button>
             </div>
           )}
         </div>
       </nav>
 
-      <div className="relative z-10 flex flex-col items-center pt-24 pb-12 px-6 text-center w-full min-h-screen">
+      <div className="relative z-10 flex flex-col items-center pt-24 pb-12 px-6 text-center w-full flex-1 overflow-y-auto">
         {currentView === 'home' ? (
           <div className="w-full max-w-4xl flex flex-col items-center">
             <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 drop-shadow-lg">

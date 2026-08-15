@@ -51,28 +51,28 @@ const HistoryCard = ({ analysis, onEditName, onDelete }) => {
       
       <div className="p-4 flex flex-col flex-grow">
         {isEditing ? (
-          <div className="mb-2 flex flex-col gap-2">
+          <div className="mb-2 flex flex-col gap-3">
             <input 
               type="text" 
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
               autoFocus
             />
             <div className="flex gap-2">
-              <button onClick={handleSaveName} className="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded">Guardar</button>
-              <button onClick={handleCancelEdit} className="text-xs bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded">Cancelar</button>
+              <button onClick={handleSaveName} className="text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg flex-1">Guardar</button>
+              <button onClick={handleCancelEdit} className="text-sm font-medium bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex-1">Cancelar</button>
             </div>
           </div>
         ) : (
           <div className="mb-2 flex justify-between items-start gap-2">
-            <h4 className="font-bold text-slate-200 text-sm">{analysis.queryName || 'Consulta sin nombre'}</h4>
+            <h4 className="font-bold text-slate-200 text-sm truncate pt-1">{analysis.queryName || 'Consulta sin nombre'}</h4>
             <button 
               onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
-              className="text-slate-400 hover:text-indigo-400 p-1"
+              className="text-slate-400 hover:text-indigo-400 p-2 -mr-2 -mt-1 rounded-lg hover:bg-slate-700/50 transition-colors"
               title="Editar nombre"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             </button>
           </div>
         )}
@@ -83,9 +83,9 @@ const HistoryCard = ({ analysis, onEditName, onDelete }) => {
         <div className="mt-4 pt-3 border-t border-slate-700 flex justify-end">
           <button 
             onClick={(e) => { e.stopPropagation(); onDelete(analysis.id); }}
-            className="flex items-center gap-1 text-xs text-slate-400 hover:text-red-400 transition-colors"
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors px-3 py-2 -mr-3 rounded-lg hover:bg-slate-700/30"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             Eliminar
           </button>
         </div>
