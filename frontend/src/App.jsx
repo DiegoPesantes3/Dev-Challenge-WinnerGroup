@@ -45,7 +45,10 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     setIsProfileMenuOpen(false);
-    try { localStorage.removeItem('mancos_user'); } catch (e) {}
+    try { 
+      localStorage.removeItem('mancos_user'); 
+      localStorage.removeItem('mancos_jwt');
+    } catch (e) {}
     if (currentView === 'dashboard' || currentView === 'history') {
       setCurrentView('home');
     }

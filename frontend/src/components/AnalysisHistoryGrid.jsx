@@ -67,13 +67,15 @@ const HistoryCard = ({ analysis, onEditName, onDelete }) => {
         ) : (
           <div className="mb-2 flex justify-between items-start gap-2">
             <h4 className="font-bold text-slate-200 text-sm truncate pt-1">{analysis.queryName || 'Consulta sin nombre'}</h4>
+            {/* 
             <button 
               onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
               className="text-slate-400 hover:text-indigo-400 p-2 -mr-2 -mt-1 rounded-lg hover:bg-slate-700/50 transition-colors"
               title="Editar nombre"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-            </button>
+            </button> 
+            */}
           </div>
         )}
         

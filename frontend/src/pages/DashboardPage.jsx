@@ -1,49 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import AnalysisHistoryGrid from '../components/AnalysisHistoryGrid';
+import api from '../services/api';
 
 const DashboardPage = ({ user, activeTab, setActiveTab }) => {
-  // MOCK DATA for History
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simular carga inicial de historial (Read)
-    setTimeout(() => {
-      setHistory([
-        {
-          id: 1,
-          queryName: 'Análisis de Zelda',
-          imageUrl: 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-          verdict: 'false',
-          date: '14 Ago 2026',
-          summary: 'La imagen ha sido detectada como generada por IA. Faltan detalles en las texturas de la espada.'
-        },
-        {
-          id: 2,
-          queryName: 'Noticia Xbox Series S',
-          imageUrl: 'https://images.unsplash.com/photo-1627389955611-70c92a5d2e2b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-          verdict: 'true',
-          date: '12 Ago 2026',
-          summary: 'La consola coincide perfectamente con las fotos oficiales.'
+    if (activeTab === 'history') {
+      const fetchHistory = async () => {
+        try {
+          setLoading(true);
+          const response = await api.get('/analyses');
+          setHistory(response.data.userHistory || []);
+        } catch (error) {
+          console.error("Error fetching history:", error);
+          setHistory([]);
+        } finally {
+          setLoading(false);
         }
-      ]);
-      setLoading(false);
-    }, 800);
-  }, []);
+      };
+      fetchHistory();
+    }
+  }, [activeTab]);
 
   // CRUD: Update Name
   const handleEditName = (id, newName) => {
+    // Temporalmente deshabilitado en backend real, mantenemos mock local
     setHistory(prev => prev.map(item => 
       item.id === id ? { ...item, queryName: newName } : item
     ));
-    // Aquí iría la llamada al backend: api.put(`/history/${id}`, { name: newName })
   };
 
   // CRUD: Delete
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if(window.confirm('¿Estás seguro de eliminar este análisis de tu historial?')) {
-      setHistory(prev => prev.filter(item => item.id !== id));
-      // Aquí iría la llamada al backend: api.delete(`/history/${id}`)
+      try {
+        await api.delete(`/analyses/${id}`);
+        setHistory(prev => prev.filter(item => item.id !== id));
+      } catch (error) {
+        console.error("Error deleting analysis:", error);
+        alert("Hubo un error al eliminar el análisis.");
+      }
     }
   };
 
