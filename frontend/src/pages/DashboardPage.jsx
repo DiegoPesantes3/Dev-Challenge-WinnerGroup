@@ -94,10 +94,9 @@ const DashboardPage = ({ user, activeTab, setActiveTab }) => {
               <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-lg">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-semibold text-indigo-300 text-sm uppercase tracking-wide">Resumen Mensual de Análisis</h4>
-                  <button className="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition-colors">Exportar CSV</button>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-slate-300">
+                <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                  <table className="w-full min-w-[500px] text-sm text-left text-slate-300">
                     <thead className="text-xs text-slate-400 bg-slate-900/50 uppercase border-b border-slate-700">
                       <tr>
                         <th className="px-4 py-2">Mes</th>
@@ -134,10 +133,9 @@ const DashboardPage = ({ user, activeTab, setActiveTab }) => {
               <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-lg">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-semibold text-cyan-300 text-sm uppercase tracking-wide">Registro de Auditoría de Usuarios</h4>
-                  <button className="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition-colors">Exportar CSV</button>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-slate-300">
+                <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                  <table className="w-full min-w-[500px] text-sm text-left text-slate-300">
                     <thead className="text-xs text-slate-400 bg-slate-900/50 uppercase border-b border-slate-700">
                       <tr>
                         <th className="px-4 py-2">Usuario</th>
@@ -174,10 +172,9 @@ const DashboardPage = ({ user, activeTab, setActiveTab }) => {
               <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-lg">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-semibold text-purple-300 text-sm uppercase tracking-wide">Rendimiento del Agente de IA</h4>
-                  <button className="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition-colors">Exportar CSV</button>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-slate-300">
+                <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                  <table className="w-full min-w-[500px] text-sm text-left text-slate-300">
                     <thead className="text-xs text-slate-400 bg-slate-900/50 uppercase border-b border-slate-700">
                       <tr>
                         <th className="px-4 py-2">Modelo</th>
@@ -214,10 +211,9 @@ const DashboardPage = ({ user, activeTab, setActiveTab }) => {
               <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-lg">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-semibold text-orange-300 text-sm uppercase tracking-wide">Principales Fuentes Engañosas</h4>
-                  <button className="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition-colors">Exportar CSV</button>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-slate-300">
+                <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                  <table className="w-full min-w-[500px] text-sm text-left text-slate-300">
                     <thead className="text-xs text-slate-400 bg-slate-900/50 uppercase border-b border-slate-700">
                       <tr>
                         <th className="px-4 py-2">Dominio de Origen</th>

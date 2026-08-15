@@ -6,8 +6,14 @@ const PricingModal = ({ onClose, onPurchase }) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-slate-900 rounded-xl p-6 w-[min(920px,95vw)]">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-slate-900 rounded-xl p-6 w-[min(920px,95vw)]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold">Precios (simulados)</h3>
           <button onClick={onClose} className="text-slate-400 hover:text-white">✕</button>
