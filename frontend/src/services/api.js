@@ -8,6 +8,18 @@ const api = axios.create({
   },
 });
 
+// Interceptor para inyectar el token JWT en las peticiones
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('mancos_jwt');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Interceptor para manejo global de respuestas (opcional)
 api.interceptors.response.use(
   (response) => response,
