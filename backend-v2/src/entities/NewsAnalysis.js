@@ -13,5 +13,8 @@ export const NewsAnalysis = new EntitySchema({
     },
     relations: {
         user: { target: "User", type: "many-to-one" }
-    }
+    },
+    checks: [
+        { expression: `"confidenceLevel" >= 0 AND "confidenceLevel" <= 100` }
+    ]
 });
