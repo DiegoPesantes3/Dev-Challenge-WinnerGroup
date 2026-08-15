@@ -21,8 +21,15 @@ export const register = async (req, res) => {
             return res.status(409).json({ error: "Email already registered" })
         }
 
+        const roleRepo = AppDataSource.getRepository("Role");
+        let defaultRole = await roleRepo.findOne({ where: { name: "User" } });
+
+        if (!defaultRole) {
+            defaultRole = await roleRepo.save({ name: "User" });
+        }
+
         const hash = await bcrypt.hash(password, 10)
-        await userRepo.save({ email, password: hash })
+        await userRepo.save({ email, password: hash, role: defaultRole })
 
         return res.status(201).json({
             message: "User registered successfully"
